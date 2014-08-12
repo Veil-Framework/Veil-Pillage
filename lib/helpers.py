@@ -5,7 +5,7 @@ Reusable helpers that don't quite fit anywhere else.
 """
 
 import zlib, re, textwrap, commands, datetime, time
-import random, string, string, base64, os
+import random, string, base64, os, socket
 
 import settings
 
@@ -29,9 +29,10 @@ def validIP(IP):
     """
     Tries to validate an IP.
     """
-    if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', IP):
+    try:
+        socket.inet_aton(IP)
         return True
-    else:
+    except:
         return False
 
 
