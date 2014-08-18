@@ -136,3 +136,4 @@ class Module:
 
             else:
                 self.output += "\n[!] Got unexpected output: %s" % results
+                
