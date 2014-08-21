@@ -48,7 +48,7 @@ class Module:
 
         for target in self.targets:
 
-            print " [*] Doing soemthing on %s" %(target)
+            print " [*] Doing something on %s" %(target)
             command = "something to do on the host"
 
             # ...
