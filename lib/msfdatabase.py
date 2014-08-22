@@ -19,6 +19,9 @@ class Database:
         # metasploit DB connection object
         self.conn = None
 
+        # Database name
+        self.databasename = None
+
 
     def connect(self, databaseString=None):
         """
@@ -46,7 +49,7 @@ class Database:
                 if databaseString:
                     userPass, details = databaseString.split("@")
                     username, password = userPass.split(":")
-                    hostport, databasename = details.split("/")
+                    hostport, self.databasename = details.split("/")
                     dbHost, dbPort = hostport.split(":")
 
                 # try to grab the config string from the /etc/veil/settings.py file
@@ -55,7 +58,7 @@ class Database:
                     if s != "":
                         userPass, details = s.split("@")
                         username, password = userPass.split(":")
-                        hostport, databasename = details.split("/")
+                        hostport, self.databasename = details.split("/")
                         dbHost, dbPort = hostport.split(":")
                     else:
                         print helpers.color("\n [!] Could not connect to the MSF database!", warning=True)
@@ -64,7 +67,7 @@ class Database:
                         self.conn = False
                         return False
                 
-                self.conn = psycopg2.connect(host=dbHost, port=dbPort, database=databasename, user=username, password=password)
+                self.conn = psycopg2.connect(host=dbHost, port=dbPort, database=self.databasename, user=username, password=password)
 
                 print ""
                 print helpers.color(" [*] Successfully connected to the MSF database")
@@ -101,7 +104,7 @@ class Database:
             cur = self.conn.cursor()
 
             # execute the query for unique host addresses
-            cur.execute('SELECT DISTINCT address from msf3.public.hosts;')
+            cur.execute('SELECT DISTINCT address from %s.public.hosts;' % self.databasename)
 
             # get ALL the results and close off our cursor
             results = cur.fetchall()
@@ -127,7 +130,7 @@ class Database:
             cur = self.conn.cursor()
 
             # execute the query for creds -> gotta join the creds, services and hosts tables
-            cur.execute('SELECT hosts.address, services.port, creds.user, creds.pass FROM msf3.public.creds creds INNER JOIN msf3.public.services services on creds.service_id = services.id INNER JOIN msf3.public.hosts on services.host_id = hosts.id;')
+            cur.execute('SELECT hosts.address, services.port, creds.user, creds.pass FROM %s.public.creds creds INNER JOIN %s.public.services services on creds.service_id = services.id INNER JOIN %s.public.hosts on services.host_id = hosts.id;' % tuple([self.databasename]*3))
 
             # get ALL the results and close off our cursor
             creds = cur.fetchall()
@@ -151,7 +154,7 @@ class Database:
 
             foundListeners = []
 
-            cur.execute('SELECT data FROM msf3.public.notes where ntype=\'cloudstrike.listeners\'')
+            cur.execute('SELECT data FROM %s.public.notes where ntype=\'cloudstrike.listeners\'' % self.databasename)
 
             # get ALL the results and close off our cursor
             results = cur.fetchall()
