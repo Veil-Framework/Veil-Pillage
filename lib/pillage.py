@@ -298,7 +298,8 @@ class Pillage:
                 if line != "":
                     if ":" in line:
                         # split the line up
-                        parts = [x.strip() for x in line.split(":") if x != ""]
+                        parts = [x.strip() for x in line.strip().split(":") if x != ""]
+                        print "parts:",parts
 
                         # check if we have "user:password" foramt
                         if len(parts) == 2:
