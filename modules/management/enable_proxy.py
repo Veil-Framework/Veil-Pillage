@@ -88,13 +88,17 @@ class Module:
 
             elif "0x0" in results:
                 server_results = command_methods.executeResult(target, username, password, proxyCheckServerCmd, triggerMethod)
-                
+                proxy = ""
+
                 for res in server_results.split(" "):
                     r = re.findall(r".+:[0-9]{1,5}", res)
                     if r:
                         proxy = r[0]
 
-                self.output += "\n[*] Proxy has been disabled but set to %s on %s" % (proxy, target)
+                if proxy == "":
+                    self.output += "\n[*] Proxy has been disabled on %s" % (target)
+                else:
+                    self.output += "\n[*] Proxy has been disabled but set to %s on %s" % (proxy, target)
 
                 self.output += "\n[*] Enabling proxy"
 
@@ -110,28 +114,32 @@ class Module:
                     if "The operation completed successfully" in set_results:
                         self.output += "\n[*] Proxy address successfully set to %s on %s" % (proxyUrl, target)
 
-                        cleanupCMD = "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyEnable /t REG_DWORD /d 0 /f && reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyServer /t REG_SZ /d %s /f" % proxy
+                        cleanupCMD = "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyEnable /t REG_DWORD /d 0 /f && reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyServer /t REG_SZ /d \"%s\" /f" % proxy
                         self.cleanup += "executeCommand|"+target+"|"+username+"|"+password+"|"+cleanupCMD+"|"+triggerMethod+"\n"
             
 
             elif "0x1" in results:
                 server_results = command_methods.executeResult(target, username, password, proxyCheckServerCmd, triggerMethod)
+                proxy = ""
                 
                 for res in server_results.split(" "):
                     r = re.findall(r".+:[0-9]{1,5}", res)
                     if r:
                         proxy = r[0]
 
-                self.output += "\n[*] Proxy already enabled and set to %s on %s" % (proxy, target)
+                if proxy == "":
+                    self.output += "\n[*] Proxy already enabled on %s" % (target)
+                else:
+                    self.output += "\n[*] Proxy already enabled and set to %s on %s" % (proxy, target)
 
                 self.output += "\n[*] Setting proxy server on " + target
 
                 set_results = command_methods.executeResult(target, username, password, proxySetCmd, triggerMethod)
 
                 if "The operation completed successfully" in set_results:
-                    self.output += "\n[*] Proxy address successfully set to  on %s" % (proxyUrl, target)
+                    self.output += "\n[*] Proxy address successfully set to %s on %s" % (proxyUrl, target)
 
-                    cleanupCMD = "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyServer /t REG_SZ /d %s /f" % proxy
+                    cleanupCMD = "reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\" /v ProxyServer /t REG_SZ /d \"%s\" /f" % proxy
                     self.cleanup += "executeCommand|"+target+"|"+username+"|"+password+"|"+cleanupCMD+"|"+triggerMethod+"\n"
 
             else:

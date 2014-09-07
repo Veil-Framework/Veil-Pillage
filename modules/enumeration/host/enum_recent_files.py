@@ -54,7 +54,7 @@ class Module:
             command = "echo %USERPROFILE%"
             user_profile = command_methods.executeResult(target, username, password, command, trigger_method)
             if user_profile == '':
-                self.output += "[!] No result file querying env variables using creds " + username + ":" + password + " on: " + target + "\n"
+                self.output += " [!] No result file querying env variables using creds " + username + ":" + password + " on: " + target + "\n"
             else:
                 user_profile = user_profile.strip(" \r\n")
 
@@ -74,8 +74,11 @@ class Module:
                             if file[-3:] == "lnk":
                                 out = smb.getFile(target, username, password, path + "\\" + file, delete=False)
                                 if out == '':
-                                    self.output += "[!] Failed retrieving : %s \n" % file
+                                    self.output += " [!] Failed retrieving : %s \n" % file
                                 else:
                                     save_path = helpers.saveModuleFile(self, target, file, out)
-                                    parsed_lnk = str(pylnk.parse(save_path)).decode('cp1252')
-                                    helpers.saveModuleFile(self, target, file + '_details', parsed_lnk)
+                                    try:
+                                        parsed_lnk = str(pylnk.parse(save_path)).decode('cp1252')
+                                        helpers.saveModuleFile(self, target, file + '_details', parsed_lnk)
+                                    except:
+                                        self.output += " [!] Error while parsing : %s \n" % save_path
