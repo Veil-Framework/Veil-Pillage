@@ -7,7 +7,8 @@ Includes:
 
     ThreadedSMBServer()     - for local smb file hosting
     smbConn()               - establish an SMB connection to a target
-    getFile()               - download a particular file from a target    
+    getFile()               - download a particular file from a target
+    ls()                    - list all files in a directory    
     uploadFileConn()        - upload a file to a host using an established SMB connection
     uploadFile()            - upload a file to a host over smb using specified credentials 
     checkAdminShare()       - see if the ADMIN$ share is writeable on a target
@@ -122,6 +123,47 @@ def getFile(target, username, password, fileName, delete=False):
         conn.logoff()
 
     return out
+
+
+def ls(target, username, password, path, path_error=True):
+    """
+    Performs a directory listing of a given path
+
+    path_error=True will print a warning if the supplied path does not exist
+    """
+
+    # establish our smb connection
+    conn = smbConn(target, username, password)
+    file_names = []
+
+    if conn:
+
+        try:
+
+            #if our path ends with a \ strip it
+            if path[-1:] == "\\":
+                path = path[:-1]
+
+            # if we're passed a full path filename with C:\Path\blah
+            # strip out the preceeding "C:"
+            if path.lower()[:2] == "c:":
+                path = "\\".join(path.split("\\")[1:]) + "\\*"
+
+            files = conn.listPath("C$", path)
+            for f in files:
+                file_names.append(f.get_longname())
+
+        except Exception as e:
+            if "STATUS_OBJECT_PATH_NOT_FOUND" in str(e):
+                if path_error:
+                    print helpers.color(" [!] Error: " + path + " does not exist", warning=True)
+            elif "STATUS_OBJECT_NAME_INVALID" in str(e):
+                if path_error:
+                    print helpers.color(" [!] Error: " + path + " does not exist", warning=True)
+            else:
+                print helpers.color(" [!] Error in execution: " + str(e), warning=True)
+
+    return file_names
 
 
 def checkAdminShare(smbConn):
