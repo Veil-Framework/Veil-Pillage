@@ -9,7 +9,8 @@ Module built by @byt3bl33d3r
 from lib import smb
 from lib import command_methods
 from lib import helpers
-from lib import pylnk
+# from lib import pylnk
+from lib import pylnker
 
 class Module:
     
@@ -77,8 +78,11 @@ class Module:
                                     self.output += " [!] Failed retrieving : %s \n" % file
                                 else:
                                     save_path = helpers.saveModuleFile(self, target, file, out)
+                                    self.output += " [*] .lnk file %s saved from %s to %s\n" % (file,path,save_path)
                                     try:
-                                        parsed_lnk = str(pylnk.parse(save_path)).decode('cp1252')
-                                        helpers.saveModuleFile(self, target, file + '_details', parsed_lnk)
+                                        # parsed_lnk = str(pylnk.parse(save_path)).decode('cp1252')
+                                        parsed_lnk = pylnker.parse_lnk(save_path)
+                                        details_path = helpers.saveModuleFile(self, target, file + '_details', parsed_lnk)
+                                        self.output += " [*] .lnk file %s parsed and saved to %s\n" % (save_path,details_path)
                                     except:
                                         self.output += " [!] Error while parsing : %s \n" % save_path

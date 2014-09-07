@@ -1,4 +1,8 @@
 [9.7.2014]
+    Released.: version 1.1.1
+    Modified.: enumeration/host/enum_recent_files now uses ported pylnker code
+
+[9.7.2014]
     Released.: version 1.1.0
     Added....: enumeration/host/enum_recent_files by @byt3bl33d3r
     Added....: ls() command in smb library by @byt3bl33d3r

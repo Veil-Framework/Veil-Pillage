@@ -7,7 +7,7 @@ from lib import helpers
 import os, sys
 
 
-version = "1.1.0"
+version = "1.1.1"
 
 ###############################################################
 #
