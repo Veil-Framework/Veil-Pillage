@@ -130,8 +130,15 @@ class Database:
             cur = self.conn.cursor()
 
             # execute the query for creds -> gotta join the creds, services and hosts tables
-            cur.execute('SELECT hosts.address, services.port, creds.user, creds.pass FROM %s.public.creds creds INNER JOIN %s.public.services services on creds.service_id = services.id INNER JOIN %s.public.hosts on services.host_id = hosts.id;' % tuple([self.databasename]*3))
-
+            #cur.execute('SELECT hosts.address, services.port, creds.user, creds.pass FROM %s.public.creds creds INNER JOIN %s.public.services services on creds.service_id = services.id INNER JOIN %s.public.hosts on services.host_id = hosts.id;' % tuple([self.databasename]*3))
+            
+            # Above is the previous check. The current structure uses the tables and joins as below.
+            cur.execute('SELECT realms.value, services.port, publics.username, privates.data FROM %s.public.metasploit_credential_cores cores \
+                LEFT JOIN %s.public.metasploit_credential_privates privates ON cores.private_id = privates.id \
+                LEFT JOIN %s.public.metasploit_credential_publics publics ON cores.public_id = publics.id \
+                LEFT JOIN %s.public.metasploit_credential_origin_services oservices ON cores.origin_id = oservices.id \
+                LEFT JOIN %s.public.services ON oservices.service_id = services.id \
+                LEFT JOIN %s.public.metasploit_credential_realms realms ON cores.realm_id = realms.id;' % tuple([self.databasename]*6)) 
             # get ALL the results and close off our cursor
             creds = cur.fetchall()
             cur.close()
