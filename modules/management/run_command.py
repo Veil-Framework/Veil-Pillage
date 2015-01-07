@@ -43,8 +43,7 @@ class Module:
             result = command_methods.executeResult(target, username, password, command, triggerMethod)
 
             if result != "":
-                self.output += "[*] Results for '%s' using creds '"+username+":"+password+"' on %s : " %(command, target) + "\n"
+                self.output += "[*] Results for '"+command+"' using creds '"+username+":"+password+"' on "+target+" : \n"
                 self.output += result
                 self.output += "\n\n"
-
 
