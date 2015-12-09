@@ -36,7 +36,7 @@ def setup():
     except:
         print " [*] Installing impacket...\n"
         # use a revision number we know works :)
-        os.system("svn checkout http://impacket.googlecode.com/svn/trunk/@1252 /tmp/impacket/")
+        os.system("git clone https://github.com/CoreSecurity/impacket.git  /tmp/impacket/")
         os.system("cd /tmp/impacket/ && python setup.py install")
 
 
